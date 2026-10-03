@@ -1,0 +1,12 @@
+node_modules/
+*.log
+.DS_Store
+
+# Local exports produced by the panel
+api-log-*.har
+api-log-*.json
+
+# Packaged extension
+*.zip
+*.crx
+*.pem

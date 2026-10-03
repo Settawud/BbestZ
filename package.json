@@ -1,0 +1,11 @@
+{
+  "name": "api-log-extension",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "A personal Chrome/Edge DevTools extension for inspecting API request and response logs.",
+  "scripts": {
+    "test": "node --test \"test/**/*.test.js\"",
+    "test:panel": "node test/panel.smoke.mjs"
+  }
+}

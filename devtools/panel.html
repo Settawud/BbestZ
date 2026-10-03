@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>API Log</title>
+    <link rel="stylesheet" href="panel.css" />
+  </head>
+  <body>
+    <header class="toolbar">
+      <button id="record" class="btn" type="button" aria-pressed="true" title="Pause capture">
+        <span class="rec-dot" aria-hidden="true"></span><span id="record-label">Recording</span>
+      </button>
+      <button id="clear" class="btn" type="button" title="Clear the log (Ctrl/Cmd+K)">Clear</button>
+
+      <span class="sep" role="separator"></span>
+
+      <input
+        id="filter"
+        class="field"
+        type="search"
+        autocomplete="off"
+        spellcheck="false"
+        placeholder="Filter URL — prefix with - to exclude"
+        aria-label="Filter by URL"
+      />
+      <input
+        id="body-search"
+        class="field"
+        type="search"
+        autocomplete="off"
+        spellcheck="false"
+        placeholder="Search headers &amp; bodies"
+        aria-label="Search inside headers and bodies"
+      />
+
+      <span class="sep" role="separator"></span>
+
+      <div id="status-chips" class="chips" role="group" aria-label="Filter by status"></div>
+      <div id="method-chips" class="chips" role="group" aria-label="Filter by method"></div>
+
+      <label class="toggle" title="Show only XHR, fetch, EventSource and WebSocket traffic">
+        <input type="checkbox" id="api-only" checked /> API only
+      </label>
+      <label class="toggle" title="Show only failures and 4xx/5xx responses">
+        <input type="checkbox" id="only-errors" /> Errors
+      </label>
+      <label class="toggle" title="Keep the log across page navigations">
+        <input type="checkbox" id="preserve-log" /> Preserve log
+      </label>
+
+      <span class="spacer"></span>
+
+      <button id="view-toggle" class="btn" type="button" aria-pressed="false">Endpoints</button>
+      <div class="menu-wrap">
+        <button id="export" class="btn" type="button" aria-expanded="false" aria-haspopup="true">
+          Export ▾
+        </button>
+        <div id="export-menu" class="menu" role="menu" hidden>
+          <button type="button" role="menuitem" data-action="copy-curl">Copy selected as cURL</button>
+          <button type="button" role="menuitem" data-action="copy-response">
+            Copy selected response
+          </button>
+          <div class="menu-sep" role="separator"></div>
+          <button type="button" role="menuitem" data-action="download-har">
+            Download filtered as HAR
+          </button>
+          <button type="button" role="menuitem" data-action="download-json">
+            Download filtered as JSON
+          </button>
+          <div class="menu-sep" role="separator"></div>
+          <label class="menu-check">
+            <input type="checkbox" id="redact-export" checked /> Redact auth &amp; cookie headers
+          </label>
+        </div>
+      </div>
+    </header>
+
+    <main class="body">
+      <section class="list-pane" id="list-pane" aria-label="Captured requests">
+        <table class="list" id="list-table">
+          <thead>
+            <tr>
+              <th class="col-status" scope="col"><span class="sr-only">Status</span></th>
+              <th class="col-method" scope="col">Method</th>
+              <th class="col-code" scope="col">Code</th>
+              <th class="col-path" scope="col">Path</th>
+              <th class="col-type" scope="col">Type</th>
+              <th class="col-size num" scope="col">Size</th>
+              <th class="col-time num" scope="col">Time</th>
+              <th class="col-clock num" scope="col">Started</th>
+            </tr>
+          </thead>
+          <tbody id="list-body"></tbody>
+        </table>
+
+        <table class="list endpoints" id="endpoint-table" hidden>
+          <thead>
+            <tr>
+              <th class="col-method" scope="col">Method</th>
+              <th class="col-path" scope="col">Endpoint</th>
+              <th class="col-size num" scope="col">Calls</th>
+              <th class="col-size num" scope="col">Errors</th>
+              <th class="col-time num" scope="col">Avg</th>
+              <th class="col-time num" scope="col">Min</th>
+              <th class="col-time num" scope="col">Max</th>
+              <th class="col-size num" scope="col">Bytes</th>
+            </tr>
+          </thead>
+          <tbody id="endpoint-body"></tbody>
+        </table>
+
+        <div class="empty" id="empty-state">
+          <h2>No requests captured yet</h2>
+          <p>
+            Trigger a call from the page, or reload it. Capture only runs while DevTools is open on
+            this tab.
+          </p>
+          <p class="hint">
+            <kbd>/</kbd> focus the filter · <kbd>↑</kbd><kbd>↓</kbd> move through rows ·
+            <kbd>Ctrl</kbd>/<kbd>⌘</kbd>+<kbd>K</kbd> clear
+          </p>
+        </div>
+      </section>
+
+      <div
+        class="splitter"
+        id="splitter"
+        role="separator"
+        aria-orientation="vertical"
+        tabindex="0"
+        aria-label="Resize detail pane"
+      ></div>
+
+      <aside class="detail-pane" id="detail-pane" aria-label="Request detail" hidden>
+        <div class="detail-head">
+          <div class="detail-title">
+            <span class="status-pill" id="detail-status">—</span>
+            <span class="detail-method" id="detail-method">—</span>
+            <span class="detail-url" id="detail-url" title=""></span>
+          </div>
+          <div class="detail-head-actions">
+            <button id="copy-url" class="btn small" type="button" title="Copy full URL">
+              Copy URL
+            </button>
+            <button id="close-detail" class="btn small" type="button" title="Close (Esc)">✕</button>
+          </div>
+        </div>
+        <nav class="tabs" id="detail-tabs" role="tablist"></nav>
+        <div class="detail-body" id="detail-body" role="tabpanel"></div>
+      </aside>
+    </main>
+
+    <footer class="statusbar" id="statusbar"></footer>
+    <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+    <script type="module" src="panel.js"></script>
+  </body>
+</html>
